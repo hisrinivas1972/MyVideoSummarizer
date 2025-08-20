@@ -1,4 +1,7 @@
 import os
+os.system("apt-get update && apt-get install -y ffmpeg")
+
+import os
 import subprocess
 import streamlit as st
 import whisper
