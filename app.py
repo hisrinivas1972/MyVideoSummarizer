@@ -7,6 +7,13 @@ import subprocess
 # Centered title
 st.markdown("<h1 style='text-align: center;'>🎤 Whisper Transcriber with Video & Audio Extraction</h1>", unsafe_allow_html=True)
 
+# Copyright reminder below heading, centered and styled subtly
+st.markdown(
+    "<p style='text-align: center; font-style: italic; color: gray; margin-top: -10px;'>"
+    "⚠️ Please follow copyright and usage guidelines before uploading any content."
+    "</p>", 
+    unsafe_allow_html=True
+)
 def run_ffmpeg_command(cmd):
     """Run ffmpeg command, raise error if failed."""
     result = subprocess.run(cmd, capture_output=True, text=True)
