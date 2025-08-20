@@ -14,7 +14,7 @@ The app extracts audio from uploaded videos, creates silent videos (video withou
 
 ## Demo
 
-Try the live demo here: [YOUR_STREAMLIT_APP_URL]
+Try the live demo here: https://myvideosummarizer-g5xpetuztm8zfowruaeutm.streamlit.app/
 
 ## Installation & Usage
 
