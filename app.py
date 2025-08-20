@@ -7,33 +7,29 @@ import streamlit as st
 import whisper
 import tempfile
 
-# 1) Force-install ffmpeg at runtime
+# — Force-install ffmpeg at runtime to avoid deployment issues
 os.system("apt-get update && apt-get install -y ffmpeg")
 
-# 2) App layout
-st.set_page_config(page_title="🎤 Whisper Transcriber", layout="centered")
-st.title("🎤 Whisper Video/Audio Transcriber")
+st.title("🎤 Whisper Transcriber")
 
-# 3) Verify ffmpeg installation
+# Confirm ffmpeg is indeed installed
 try:
     result = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True)
     st.success("✅ ffmpeg found: " + result.stdout.splitlines()[0])
 except Exception as e:
     st.error(f"❌ ffmpeg NOT found: {e}")
 
-# 4) File uploader
-uploaded_file = st.file_uploader(
-    "Upload an audio or video file", 
-    type=["mp3", "mp4", "mkv", "wav", "mov"]
-)
+# File uploader
+uploaded_file = st.file_uploader("Upload audio/video file", type=["mp3", "mp4", "mkv", "wav", "mov"])
 
 @st.cache_resource
 def load_model():
-    return whisper.load_model("tiny")
+    return whisper.load_model("tiny")  # Or "base" / "small" for more accuracy
 
 if uploaded_file:
-    st.info("Transcribing... Please wait ⏳")
+    st.info("Transcribing...")
 
+    # Save upload to a temp file
     with tempfile.NamedTemporaryFile(delete=False, suffix=uploaded_file.name) as tmp:
         tmp.write(uploaded_file.read())
         temp_path = tmp.name
@@ -43,11 +39,10 @@ if uploaded_file:
         result = model.transcribe(temp_path)
         transcript = result["text"]
 
-        st.success("✅ Transcription completed!")
+        st.success("✅ Transcription done!")
         st.subheader("📝 Transcript")
         st.write(transcript)
-
-        st.download_button("📄 Download TXT", transcript, file_name="transcript.txt", mime="text/plain")
+        st.download_button("Download Transcript", transcript, "transcript.txt")
     except Exception as e:
         st.error(f"❌ Transcription error: {e}")
     finally:
