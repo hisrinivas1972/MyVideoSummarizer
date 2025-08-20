@@ -4,7 +4,8 @@ import tempfile
 import os
 import subprocess
 
-st.title("🎤 Whisper Transcriber with Video & Audio Extraction")
+# Centered title
+st.markdown("<h1 style='text-align: center;'>🎤 Whisper Transcriber with Video & Audio Extraction</h1>", unsafe_allow_html=True)
 
 def run_ffmpeg_command(cmd):
     """Run ffmpeg command, raise error if failed."""
@@ -17,7 +18,8 @@ def run_ffmpeg_command(cmd):
 def load_model():
     return whisper.load_model("tiny")
 
-uploaded_file = st.file_uploader("Upload video/audio", type=["mp3", "mp4", "wav", "mkv", "mov"])
+# File uploader in sidebar
+uploaded_file = st.sidebar.file_uploader("Upload video/audio", type=["mp3", "mp4", "wav", "mkv", "mov"])
 
 if uploaded_file:
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -25,21 +27,19 @@ if uploaded_file:
         with open(input_path, "wb") as f:
             f.write(uploaded_file.read())
 
-        # Extract audio path
         audio_path = os.path.join(tmpdir, "extracted_audio.wav")
-        # Create silent video path
         silent_video_path = os.path.join(tmpdir, "silent_video" + os.path.splitext(uploaded_file.name)[1])
 
         try:
-            # Extract audio from video/audio file (if audio exists)
+            # Extract audio (for both video and audio files)
             cmd_extract_audio = [
                 "ffmpeg",
                 "-y",
                 "-i", input_path,
-                "-vn",  # no video
+                "-vn",
                 "-acodec", "pcm_s16le",
-                "-ar", "16000",  # sample rate for Whisper
-                "-ac", "1",  # mono audio
+                "-ar", "16000",
+                "-ac", "1",
                 audio_path,
             ]
             run_ffmpeg_command(cmd_extract_audio)
@@ -49,21 +49,22 @@ if uploaded_file:
                 "ffmpeg",
                 "-y",
                 "-i", input_path,
-                "-an",  # no audio
+                "-an",
                 silent_video_path,
             ]
             run_ffmpeg_command(cmd_silent_video)
 
-            # Load Whisper model and transcribe
+            # Transcribe audio with Whisper
             model = load_model()
             result = model.transcribe(audio_path)
             transcript = result["text"]
 
             st.success("✅ Transcription done!")
+
             st.write("### Transcript:")
             st.write(transcript)
 
-            # Display original video if video file
+            # Show original video if uploaded file is a video
             if uploaded_file.type.startswith("video/"):
                 st.video(input_path, format=uploaded_file.type)
 
@@ -74,7 +75,7 @@ if uploaded_file:
                     mime=uploaded_file.type,
                 )
 
-            # Provide audio download button
+            # Show extracted audio playback + download
             st.audio(audio_path, format="audio/wav")
             st.download_button(
                 "Download Extracted Audio",
@@ -83,7 +84,7 @@ if uploaded_file:
                 mime="audio/wav",
             )
 
-            # Provide transcript download
+            # Download transcript
             st.download_button(
                 "Download Transcript",
                 transcript,
